@@ -53,7 +53,8 @@ export const ConversationList = memo(function ConversationList(
   return (
     <ScrollArea
       viewportRef={viewport}
-      w={{ base: 130, sm: 340 }}
+      w="100%"
+      h="100%"
       bg="white"
       style={{
         flexShrink: 0,

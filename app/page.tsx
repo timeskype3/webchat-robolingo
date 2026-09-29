@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
-import { Alert, Center, Flex, Loader } from "@mantine/core";
+import { Alert, Center, Flex, Loader, Splitter } from "@mantine/core";
 
 import { ConversationList } from "@/components/chat/ConversationList";
 import { ChatRoom } from "@/components/chat/ChatRoom";
@@ -105,36 +105,47 @@ export default function ChatPage() {
       )}
 
       <Flex flex={1} mih={0}>
-        {/* <Splitter> */}
-        {/* <Splitter.Pane defaultSize={50} min={20} max={60}> */}
-        <ConversationList
-          conversations={conversations}
-          isLoadingMore={isLoadingMore}
-          hasMore={hasMoreRooms}
-          loadMore={loadMore}
-          loadError={roomsLoadError}
-          isLoading={isRoomsLoading}
-          selectedId={selectedId}
-          onSelectConversation={selectConversation}
-        />
-        {/* </Splitter.Pane> */}
-        {/* <Splitter.Pane defaultSize={50} min={20} style={{ height: "100%" }}> */}
-        <ChatRoom
-          key={selectedId ?? "empty"}
-          isLoadingOlder={isLoadingOlder}
-          hasMore={hasMore}
-          loadOlder={loadOlder}
-          loadError={loadError}
-          selectedConversation={selected}
-          messages={messages}
-          draft={draft}
-          isMessagesLoading={isMessagesLoading}
-          isSendLoading={isSendLoading}
-          onSetDraft={setDraft}
-          onSendMessage={handleSend}
-        />
-        {/* </Splitter.Pane> */}
-        {/* </Splitter> */}
+        <Splitter w="100%" mih={0} handleColor="gray.2">
+          <Splitter.Pane
+            defaultSize={30}
+            min={20}
+            max={50}
+            miw={0}
+            style={{ overflow: "hidden" }}
+          >
+            <ConversationList
+              conversations={conversations}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMoreRooms}
+              loadMore={loadMore}
+              loadError={roomsLoadError}
+              isLoading={isRoomsLoading}
+              selectedId={selectedId}
+              onSelectConversation={selectConversation}
+            />
+          </Splitter.Pane>
+          <Splitter.Pane
+            defaultSize={70}
+            min={50}
+            miw={0}
+            style={{ display: "flex", overflow: "hidden" }}
+          >
+            <ChatRoom
+              key={selectedId ?? "empty"}
+              isLoadingOlder={isLoadingOlder}
+              hasMore={hasMore}
+              loadOlder={loadOlder}
+              loadError={loadError}
+              selectedConversation={selected}
+              messages={messages}
+              draft={draft}
+              isMessagesLoading={isMessagesLoading}
+              isSendLoading={isSendLoading}
+              onSetDraft={setDraft}
+              onSendMessage={handleSend}
+            />
+          </Splitter.Pane>
+        </Splitter>
       </Flex>
     </Flex>
   );
