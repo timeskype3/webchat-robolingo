@@ -9,8 +9,9 @@ import {
   ScrollArea,
   Stack,
   Text,
+  Tooltip,
 } from "@mantine/core";
-import { ChatCenteredTextIcon } from "@phosphor-icons/react";
+import { ChatCenteredTextIcon, InfoIcon } from "@phosphor-icons/react";
 import type { RefObject, SubmitEvent } from "react";
 
 import { Conversation, Message } from "@/types/message-client";
@@ -55,13 +56,29 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
         </Center>
       ) : (
         <>
-          <Group p="md" bg="white" wrap="nowrap" style={{ borderBottom: "1px solid var(--mantine-color-gray-2)" }}>
-            <Avatar src={selected.profile?.pictureUrl} radius="xl" color="lineGreen" />
+          <Group
+            p="md"
+            bg="white"
+            wrap="nowrap"
+            style={{ borderBottom: "1px solid var(--mantine-color-gray-2)" }}
+          >
+            <Avatar
+              src={selected.profile?.pictureUrl}
+              radius="xl"
+              color="lineGreen"
+            />
             <Stack gap={4} miw={0}>
-              <Text fw={600} truncate>
-                {selected.profile?.displayName || selected.userId}
-              </Text>
-              <Badge size="xs" variant="light">LINE OA User</Badge>
+              <Flex align={"center"} gap={5}>
+                <Text fw={600} truncate>
+                  {selected.profile?.displayName || selected.userId}{" "}
+                </Text>
+                <Tooltip label={selected.userId}>
+                  <InfoIcon style={{ cursor: "pointer" }} />
+                </Tooltip>
+              </Flex>
+              <Badge size="xs" variant="light">
+                LINE OA User
+              </Badge>
             </Stack>
           </Group>
 

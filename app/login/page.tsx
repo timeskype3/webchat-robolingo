@@ -11,10 +11,18 @@ import {
   Title,
 } from "@mantine/core";
 import { useLogin } from "@/hooks/useLogin";
+import { SignInIcon } from "@phosphor-icons/react";
 
 export default function LoginPage() {
-  const { email, setEmail, password, setPassword, loading, error, handleSubmit } =
-    useLogin();
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    loading,
+    error,
+    handleSubmit,
+  } = useLogin();
 
   return (
     <Container size={420} py={80}>
@@ -42,7 +50,11 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.currentTarget.value)}
             />
 
-            <Button type="submit" loading={loading}>
+            <Button
+              type="submit"
+              loading={loading}
+              leftSection={<SignInIcon />}
+            >
               Sign in
             </Button>
           </Stack>

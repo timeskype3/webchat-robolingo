@@ -1,4 +1,5 @@
 import { Button, Group, Title } from "@mantine/core";
+import { SignOutIcon } from "@phosphor-icons/react";
 
 interface HeaderSectionProps {
   title: string;
@@ -15,7 +16,12 @@ export function HeaderSection(props: Readonly<HeaderSectionProps>) {
       style={{ borderBottom: "1px solid var(--mantine-color-gray-2)" }}
     >
       <Title order={3}>{title}</Title>
-      <Button variant="light" onClick={handleLogout}>
+      <Button
+        color="red"
+        variant="light"
+        onClick={handleLogout}
+        leftSection={<SignOutIcon />}
+      >
         Sign out
       </Button>
     </Group>
