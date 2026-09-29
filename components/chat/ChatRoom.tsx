@@ -1,4 +1,5 @@
 import {
+  Button,
   Avatar,
   Badge,
   Group,
@@ -13,20 +14,29 @@ import {
   Divider,
 } from "@mantine/core";
 import { ChatCenteredTextIcon, InfoIcon } from "@phosphor-icons/react";
-import { Fragment, type RefObject, type SubmitEvent } from "react";
+import {
+  Fragment,
+  useRef,
+  type SubmitEvent,
+} from "react";
 import { format, isSameDay } from "date-fns";
 import { th } from "date-fns/locale";
 
 import { Conversation, Message } from "@/types/message-client";
 import { MessageBubble } from "./MessageBubble";
 import { MessageComposer } from "./MessageComposer";
+import { useChatScroll } from "@/hooks/useChatScroll";
+import { useScrollSentinel } from "@/hooks/useScrollSentinel";
 
 interface ChatRoomProps {
+  isLoadingOlder: boolean;
+  hasMore: boolean;
+  loadOlder: () => Promise<void>;
+  loadError: boolean;
   selectedConversation?: Conversation;
   messages: Message[];
   isMessagesLoading?: boolean;
   isSendLoading?: boolean;
-  viewport: RefObject<HTMLDivElement | null>;
   draft: string;
   onSetDraft: (value: string) => void;
   onSendMessage: (event: SubmitEvent<HTMLFormElement>) => void;
@@ -36,13 +46,33 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
   const {
     selectedConversation: selected,
     messages,
-    viewport,
+    isLoadingOlder,
+    hasMore,
+    loadOlder,
+    loadError,
     isMessagesLoading,
     isSendLoading,
     draft,
     onSetDraft: setDraft,
     onSendMessage: handleSend,
   } = props;
+
+  const sentinel = useRef<HTMLDivElement>(null);
+  const { viewport, rememberPosition } = useChatScroll({ messages, isMessagesLoading, isLoadingOlder });
+
+  useScrollSentinel({
+    viewport,
+    sentinel,
+    enabled:
+      Boolean(selected) &&
+      !isMessagesLoading &&
+      !isLoadingOlder &&
+      hasMore &&
+      !loadError,
+    loadMore: loadOlder,
+    direction: "top",
+    itemCount: messages.length,
+  });
 
   return (
     <Flex direction="column" flex={1} miw={0} bg="gray.0">
@@ -85,8 +115,24 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
             </Stack>
           </Group>
 
-          <ScrollArea viewportRef={viewport} style={{ flex: 1, minHeight: 0 }}>
+          <ScrollArea
+            viewportRef={viewport}
+            onScrollPositionChange={rememberPosition}
+            styles={{ viewport: { overflowAnchor: "none" } }}
+            style={{ flex: 1, minHeight: 0 }}
+          >
             <Stack p="md" gap="sm">
+              <div ref={sentinel} style={{ height: 1 }} aria-hidden="true" />
+              {isLoadingOlder && <Loader size="sm" mx="auto" />}
+              {loadError && (
+                <Button
+                  variant="subtle"
+                  onClick={() => void loadOlder()}
+                  loading={isLoadingOlder}
+                >
+                  Retry loading messages
+                </Button>
+              )}
               {isMessagesLoading && <Loader size="sm" mx="auto" />}
 
               {messages.map((message, index) => {
@@ -104,7 +150,9 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
                         labelPosition="center"
                       />
                     )}
-                    <MessageBubble key={message.id} message={message} />
+                    <div data-message-id={message.id}>
+                      <MessageBubble message={message} />
+                    </div>
                   </Fragment>
                 );
               })}

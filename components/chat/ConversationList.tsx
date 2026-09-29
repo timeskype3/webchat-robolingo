@@ -1,8 +1,9 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { Conversation } from "@/types/message-client";
 import {
+  Button,
   Avatar,
   Box,
   Group,
@@ -13,25 +14,51 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 
+import { useScrollSentinel } from "@/hooks/useScrollSentinel";
+
 interface ConversationListProps {
+  isLoadingMore: boolean;
+  hasMore: boolean;
+  loadMore: () => Promise<void>;
+  loadError: boolean;
   conversations: Conversation[];
   isLoading?: boolean;
   selectedId: string | null;
   onSelectConversation: (id: string) => void;
 }
 
-export const ConversationList = memo(function ConversationList(props: Readonly<ConversationListProps>) {
+export const ConversationList = memo(function ConversationList(
+  props: Readonly<ConversationListProps>,
+) {
   const {
+    isLoadingMore,
+    hasMore,
+    loadMore,
+    loadError,
     conversations,
     isLoading = true,
     selectedId,
     onSelectConversation: handleSelectConversation,
   } = props;
+  const viewport = useRef<HTMLDivElement>(null);
+  const sentinel = useRef<HTMLDivElement>(null);
+  useScrollSentinel({
+    viewport,
+    sentinel,
+    enabled: !isLoading && !isLoadingMore && hasMore && !loadError,
+    loadMore,
+    direction: "bottom",
+    itemCount: conversations.length,
+  });
   return (
     <ScrollArea
+      viewportRef={viewport}
       w={{ base: 130, sm: 340 }}
       bg="white"
-      style={{ flexShrink: 0, borderRight: "1px solid var(--mantine-color-gray-2)" }}
+      style={{
+        flexShrink: 0,
+        borderRight: "1px solid var(--mantine-color-gray-2)",
+      }}
     >
       <Stack gap="xs" p="sm">
         <Text size="xs" fw={700} c="dimmed" tt="uppercase" p="xs">
@@ -54,7 +81,11 @@ export const ConversationList = memo(function ConversationList(props: Readonly<C
             aria-current={selectedId === conversation.id ? "true" : undefined}
           >
             <Group wrap="nowrap">
-              <Avatar src={conversation.profile?.pictureUrl} radius="xl" color="lineGreen" />
+              <Avatar
+                src={conversation.profile?.pictureUrl}
+                radius="xl"
+                color="lineGreen"
+              />
               <Box miw={0}>
                 <Text fw={600} truncate>
                   {conversation.profile?.displayName || conversation.userId}
@@ -66,6 +97,17 @@ export const ConversationList = memo(function ConversationList(props: Readonly<C
             </Group>
           </UnstyledButton>
         ))}
+        <div ref={sentinel} style={{ height: 1 }} aria-hidden="true" />
+        {isLoadingMore && <Loader size="sm" mx="auto" />}
+        {loadError && (
+          <Button
+            variant="subtle"
+            onClick={() => void loadMore()}
+            loading={isLoadingMore}
+          >
+            Retry loading conversations
+          </Button>
+        )}
       </Stack>
     </ScrollArea>
   );
