@@ -93,7 +93,13 @@ export default function ChatPage() {
     <Flex h="100dvh" direction="column">
       <HeaderSection title="Robolingo WebChat" onLogout={handleLogout} />
       {error && (
-        <Alert variant="light" color="blue">
+        <Alert
+          variant="light"
+          color="red"
+          p={10}
+          withCloseButton
+          onClose={() => setError("")}
+        >
           {error}
         </Alert>
       )}
