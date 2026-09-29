@@ -21,11 +21,19 @@ export function useLogin() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       router.replace("/");
     } catch {
-      setError("Sign-in failed. Please check your credentials and try again.");
+      setError("Incorrect username or password.");
     } finally {
       setLoading(false);
     }
   }
 
-  return { email, setEmail, password, setPassword, loading, error, handleSubmit };
+  return {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    loading,
+    error,
+    handleSubmit,
+  };
 }

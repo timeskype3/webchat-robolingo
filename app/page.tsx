@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { Alert, Center, Flex, Loader } from "@mantine/core";
@@ -24,13 +24,20 @@ export default function ChatPage() {
 
   const { conversations, isRoomsLoading, clearConversations } =
     useConversations({ user, onError: setError });
-  const { messages, isMessagesLoading, resetMessages } =
-    useChatMessages({ user, selectedId, onError: setError });
+  const { messages, isMessagesLoading, resetMessages } = useChatMessages({
+    user,
+    selectedId,
+    onError: setError,
+  });
   const selected = conversations.find((item) => item.id === selectedId);
 
-  const { draft, setDraft, isSendLoading, handleSend } =
-    useSendMessage({ user, selected, onError: setError });
+  const { draft, setDraft, isSendLoading, handleSend } = useSendMessage({
+    user,
+    selected,
+    onError: setError,
+  });
 
+  // Check authorization
   useEffect(() => {
     return onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -45,6 +52,7 @@ export default function ChatPage() {
     });
   }, [router, clearConversations, resetMessages]);
 
+  // Viewport
   useEffect(() => {
     const element = viewport.current;
 
@@ -53,14 +61,17 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  function selectConversation(id: string) {
-    if (id === selectedId) return;
+  const selectConversation = useCallback(
+    (id: string) => {
+      if (id === selectedId) return;
 
-    resetMessages(true);
-    setDraft("");
-    setError("");
-    setSelectedId(id);
-  }
+      resetMessages(true);
+      setDraft("");
+      setError("");
+      setSelectedId(id);
+    },
+    [selectedId, resetMessages, setDraft],
+  );
 
   async function handleLogout() {
     try {
@@ -80,7 +91,7 @@ export default function ChatPage() {
 
   return (
     <Flex h="100dvh" direction="column">
-      <HeaderSection title="Robolingo Webchat" onLogout={handleLogout} />
+      <HeaderSection title="Robolingo WebChat" onLogout={handleLogout} />
       {error && (
         <Alert variant="light" color="blue">
           {error}

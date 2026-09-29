@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Conversation } from "@/types/message-client";
 import {
   Avatar,
@@ -19,7 +20,7 @@ interface ConversationListProps {
   onSelectConversation: (id: string) => void;
 }
 
-export function ConversationList(props: Readonly<ConversationListProps>) {
+export const ConversationList = memo(function ConversationList(props: Readonly<ConversationListProps>) {
   const {
     conversations,
     isLoading = true,
@@ -68,4 +69,4 @@ export function ConversationList(props: Readonly<ConversationListProps>) {
       </Stack>
     </ScrollArea>
   );
-}
+});

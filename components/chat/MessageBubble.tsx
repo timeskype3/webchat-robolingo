@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Message } from "@/types/message-client";
 import { DIRECTION } from "@/types/message-shared";
 import { Flex, Paper, Text } from "@mantine/core";
@@ -14,7 +15,7 @@ const statusLabels = {
   UNKNOWN: "Unknown",
 };
 
-export function MessageBubble({ message }: Readonly<MessageBubbleProps>) {
+export const MessageBubble = memo(function MessageBubble({ message }: Readonly<MessageBubbleProps>) {
   const outgoing = message.direction === DIRECTION.OUTGOING;
 
   return (
@@ -47,4 +48,4 @@ export function MessageBubble({ message }: Readonly<MessageBubbleProps>) {
       </Paper>
     </Flex>
   );
-}
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import type { User } from "firebase/auth";
 import type { Conversation } from "@/types/message-client";
 
@@ -18,7 +18,7 @@ export function useSendMessage({
   const [draft, setDraft] = useState("");
   const [isSendLoading, setIsSendLoading] = useState(false);
 
-  async function handleSend(event: FormEvent<HTMLFormElement>) {
+  async function handleSend(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!user || !selected || !draft.trim() || isSendLoading) return;
