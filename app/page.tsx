@@ -1,69 +1,116 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, signOut, type User } from "firebase/auth";
+import { Alert, Center, Flex, Loader } from "@mantine/core";
+
+import { ConversationList } from "@/components/chat/ConversationList";
+import { ChatRoom } from "@/components/chat/ChatRoom";
+import { HeaderSection } from "@/components/chat/HeaderSection";
+import { auth } from "@/lib/firebase-client";
+import { useConversations } from "@/hooks/useConversations";
+import { useChatMessages } from "@/hooks/useChatMessages";
+import { useSendMessage } from "@/hooks/useSendMessage";
+
+export default function ChatPage() {
+  const router = useRouter();
+  const viewport = useRef<HTMLDivElement>(null);
+
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState<boolean>(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
+
+  const { conversations, isRoomsLoading, clearConversations } =
+    useConversations({ user, onError: setError });
+  const { messages, isMessagesLoading, resetMessages } =
+    useChatMessages({ user, selectedId, onError: setError });
+  const selected = conversations.find((item) => item.id === selectedId);
+
+  const { draft, setDraft, isSendLoading, handleSend } =
+    useSendMessage({ user, selected, onError: setError });
+
+  useEffect(() => {
+    return onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthReady(true);
+
+      if (!currentUser) {
+        clearConversations();
+        resetMessages();
+        setSelectedId(null);
+        router.replace("/login");
+      }
+    });
+  }, [router, clearConversations, resetMessages]);
+
+  useEffect(() => {
+    const element = viewport.current;
+
+    if (element) {
+      element.scrollTop = element.scrollHeight;
+    }
+  }, [messages]);
+
+  function selectConversation(id: string) {
+    if (id === selectedId) return;
+
+    resetMessages(true);
+    setDraft("");
+    setError("");
+    setSelectedId(id);
+  }
+
+  async function handleLogout() {
+    try {
+      await signOut(auth);
+    } catch {
+      setError("Something went wrong, please sign out again");
+    }
+  }
+
+  if (!authReady || !user) {
+    return (
+      <Center h="100dvh">
+        <Loader />
+      </Center>
+    );
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <Flex h="100dvh" direction="column">
+      <HeaderSection title="Robolingo Webchat" onLogout={handleLogout} />
+      {error && (
+        <Alert variant="light" color="blue">
+          {error}
+        </Alert>
+      )}
+
+      <Flex flex={1} mih={0}>
+        {/* <Splitter> */}
+        {/* <Splitter.Pane defaultSize={50} min={20} max={60}> */}
+        <ConversationList
+          conversations={conversations}
+          isLoading={isRoomsLoading}
+          selectedId={selectedId}
+          onSelectConversation={selectConversation}
         />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        {/* </Splitter.Pane> */}
+        {/* <Splitter.Pane defaultSize={50} min={20} style={{ height: "100%" }}> */}
+        <ChatRoom
+          selectedConversation={selected}
+          messages={messages}
+          draft={draft}
+          viewport={viewport}
+          isMessagesLoading={isMessagesLoading}
+          isSendLoading={isSendLoading}
+          onSetDraft={setDraft}
+          onSendMessage={handleSend}
+        />
+        {/* </Splitter.Pane> */}
+        {/* </Splitter> */}
+      </Flex>
+    </Flex>
   );
 }
