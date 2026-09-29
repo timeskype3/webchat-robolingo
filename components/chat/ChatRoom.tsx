@@ -10,9 +10,12 @@ import {
   Stack,
   Text,
   Tooltip,
+  Divider,
 } from "@mantine/core";
 import { ChatCenteredTextIcon, InfoIcon } from "@phosphor-icons/react";
-import type { RefObject, SubmitEvent } from "react";
+import { Fragment, type RefObject, type SubmitEvent } from "react";
+import { format, isSameDay } from "date-fns";
+import { th } from "date-fns/locale";
 
 import { Conversation, Message } from "@/types/message-client";
 import { MessageBubble } from "./MessageBubble";
@@ -86,9 +89,25 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
             <Stack p="md" gap="sm">
               {isMessagesLoading && <Loader size="sm" mx="auto" />}
 
-              {messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
-              ))}
+              {messages.map((message, index) => {
+                const date = message.sentAt.toDate();
+                const previousMessage = messages[index - 1];
+                const showDate =
+                  !previousMessage ||
+                  !isSameDay(previousMessage.sentAt.toDate(), date);
+                return (
+                  <Fragment key={message.id}>
+                    {showDate && (
+                      <Divider
+                        my="md"
+                        label={format(date, "d MMMM yyyy", { locale: th })}
+                        labelPosition="center"
+                      />
+                    )}
+                    <MessageBubble key={message.id} message={message} />
+                  </Fragment>
+                );
+              })}
             </Stack>
           </ScrollArea>
 
