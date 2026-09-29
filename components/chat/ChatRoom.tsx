@@ -1,4 +1,7 @@
 import {
+  Avatar,
+  Badge,
+  Group,
   Center,
   EmptyState,
   Flex,
@@ -38,7 +41,7 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
   } = props;
 
   return (
-    <Flex direction="column" flex={1} miw={0}>
+    <Flex direction="column" flex={1} miw={0} bg="gray.0">
       {!selected ? (
         <Center flex={1}>
           <EmptyState
@@ -52,9 +55,15 @@ export function ChatRoom(props: Readonly<ChatRoomProps>) {
         </Center>
       ) : (
         <>
-          <Text fw={600} p="md" truncate>
-            {selected.profile?.displayName || selected.userId}
-          </Text>
+          <Group p="md" bg="white" wrap="nowrap" style={{ borderBottom: "1px solid var(--mantine-color-gray-2)" }}>
+            <Avatar src={selected.profile?.pictureUrl} radius="xl" color="lineGreen" />
+            <Stack gap={4} miw={0}>
+              <Text fw={600} truncate>
+                {selected.profile?.displayName || selected.userId}
+              </Text>
+              <Badge size="xs" variant="light">LINE OA User</Badge>
+            </Stack>
+          </Group>
 
           <ScrollArea viewportRef={viewport} style={{ flex: 1, minHeight: 0 }}>
             <Stack p="md" gap="sm">

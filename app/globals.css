@@ -1,13 +1,9 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #F8F9FA;
-    --foreground: #ededed;
-  }
+  color-scheme: light;
+  --background: #f8f9fa;
+  --foreground: #2c2e33;
+  --mantine-color-body: #f8f9fa;
+  --mantine-color-text: #2c2e33;
 }
 
 html {
@@ -26,7 +22,7 @@ body {
   flex-direction: column;
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -42,8 +38,23 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+
+.chat-conversation {
+  border: 1px solid transparent;
+  border-radius: var(--mantine-radius-md);
+  transition: background-color 150ms ease;
+}
+
+.chat-conversation:hover {
+  background: var(--mantine-color-gray-0);
+}
+
+.chat-conversation[aria-current="true"] {
+  background: var(--mantine-color-lineGreen-0);
+  border-color: var(--mantine-color-lineGreen-1);
+}
+
+.chat-conversation:focus-visible {
+  outline: 2px solid var(--mantine-color-lineGreen-8);
+  outline-offset: -2px;
 }

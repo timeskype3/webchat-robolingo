@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   return (
     <Container size={420} py={80}>
-      <Paper withBorder shadow="sm" p="xl" radius="md">
+      <Paper withBorder shadow="xs" bg="white" p="xl" radius="md">
         <form onSubmit={handleSubmit}>
           <Stack>
             <Title order={2}>Sign in to Robolingo chat</Title>

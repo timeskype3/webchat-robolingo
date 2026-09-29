@@ -21,10 +21,13 @@ export function MessageBubble({ message }: Readonly<MessageBubbleProps>) {
     <Flex justify={outgoing ? "flex-end" : "flex-start"}>
       <Paper
         p="sm"
-        radius="md"
+        radius="lg"
+        shadow="xs"
+        withBorder
         maw="80%"
-        bg={outgoing ? "blue.0" : "gray.1"}
-        c="dark.9"
+        bg={outgoing ? "lineGreen.0" : "white"}
+        c={outgoing ? "lineGreen.9" : "gray.8"}
+        style={{ borderColor: outgoing ? "var(--mantine-color-lineGreen-1)" : "var(--mantine-color-gray-2)" }}
       >
         {message.messageType === "sticker" ? (
           <Text fs="italic" c="dimmed">

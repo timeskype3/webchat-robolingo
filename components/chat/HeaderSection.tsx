@@ -11,7 +11,8 @@ export function HeaderSection(props: Readonly<HeaderSectionProps>) {
     <Group
       justify="space-between"
       p="md"
-      style={{ borderBottom: "1px solid #ddd" }}
+      bg="white"
+      style={{ borderBottom: "1px solid var(--mantine-color-gray-2)" }}
     >
       <Title order={3}>{title}</Title>
       <Button variant="light" onClick={handleLogout}>
